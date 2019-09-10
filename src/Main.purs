@@ -1,23 +1,25 @@
-module Main (
-      main
+module Main 
+    ( main
     ) where
 
 
 import Prelude
-import Data.Array       (fromFoldable)
-import Data.FunctorWithIndex   (mapWithIndex)
-import Data.List        (List)
-import Data.Maybe       (Maybe(Just, Nothing))
-import Data.Tuple       (Tuple(Tuple))
-import Effect           (Effect)
 
-import Spork.Html       as H
-import Spork.Html       (Html, attr, always, input, onValueInput, style, 
-                            text, value)
-import Spork.PureApp    (makeWithSelector)
+import Data.Array               (fromFoldable)
+import Data.FunctorWithIndex    (mapWithIndex)
+import Data.List                (List)
+import Data.Maybe               (Maybe(Just, Nothing))
+import Data.Tuple               (Tuple(Tuple))
+import Effect                   (Effect)
 
-import Sudoku           (SudokuBoard, SudokuDigit, emptyBoard, getRowLists,
-                        isBoardFilled, isBoardSolved, readDigit, setCell)
+import Spork.Html   as H
+import Spork.Html               (Html, attr, always, input, onValueInput, 
+                                style, text, value)
+import Spork.PureApp            (makeWithSelector)
+
+import Sudoku                   (BoardPosition, SudokuBoard, SudokuDigit, 
+                                getRowLists, isBoardFilled, isBoardSolved, 
+                                loadBoard, readDigit, setCell)
 
 
 main :: Effect Unit
@@ -34,12 +36,11 @@ main = void $ makeWithSelector
 type Model = SudokuBoard
 
 init :: Model
-init = emptyBoard
-
+init = loadBoard "145327698839654127672918543496185372218473956753296481367542819984761235521839764"
 
 -- Update code
 
-data Action = Update (Tuple Int Int) SudokuDigit
+data Action = Update BoardPosition SudokuDigit
 
 update :: Model -> Action -> Model
 update model (Update boardPos newDigit) = setCell boardPos newDigit model
@@ -66,7 +67,7 @@ renderRow row rowList = H.div [] $ fromFoldable
         ( \col digit -> renderCell digit (Tuple row col) )
         rowList ) 
 
-renderCell :: SudokuDigit -> Tuple Int Int -> Html Action
+renderCell :: SudokuDigit -> BoardPosition -> Html Action
 renderCell digit boardPos = 
     input [ value $ show digit
           , attr "size" "1"
